@@ -16,8 +16,6 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable {
     string[] private _uris;
 
     mapping(address donator => uint256 donationCount) private _donationAmounts;
-    mapping(address asset => address priceFeed) private _priceFeeds;
-
     uint256 private _tokenId;
 
     constructor(string memory _name, string memory _symbol, uint8[] memory levels_, string[] memory uris_)
@@ -43,7 +41,7 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable {
         _uris.push(uris_[0]);
 
         if (levelsLength == 1) {
-            emit FourDollarCreated(msg.sender, levelsLength);
+            emit Creation(msg.sender, levelsLength);
             return;
         }
 
@@ -60,7 +58,7 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable {
             }
         }
 
-        emit FourDollarCreated(msg.sender, levelsLength);
+        emit Creation(msg.sender, levelsLength);
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -75,27 +73,6 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable {
 
     function tokenURI(uint256 tokenId) public view virtual override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
-    }
-
-    function setPriceFeed(address _asset, address _priceFeed) external onlyOwner {
-        if (_asset == address(0) || _priceFeed == address(0)) {
-            revert ZeroAddress();
-        }
-
-        if (_priceFeeds[_asset] != address(0)) {
-            revert PriceFeedAlreadySet(_asset);
-        }
-
-        if (AggregatorV3Interface(_priceFeed).decimals() == 0) {
-            revert InvalidPriceFeed(_asset);
-        }
-
-        _priceFeeds[_asset] = _priceFeed;
-        emit PriceFeedSet(_asset, _priceFeed);
-    }
-
-    function priceFeed(address _asset) external view override returns (address) {
-        return _priceFeeds[_asset];
     }
 
     function donationAmount(address _donator) external view override returns (uint256) {
@@ -139,7 +116,7 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable {
         _setTokenURI(tokenId_, _uris[_level]);
     }
 
-    function donate(address _asset, uint256 _amount) external {
+    function donate() external payable {
         // TODO: Implement this function
     }
 
