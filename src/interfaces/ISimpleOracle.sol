@@ -4,6 +4,7 @@ pragma solidity ^0.8.23;
 interface ISimpleOracle {
     error PriceFeedAlreadySet(address asset);
     error InvalidPriceFeed(address asset);
+    error InvalidPrice();
 
     event PriceFeedSet(address indexed asset, address indexed priceFeed);
 
