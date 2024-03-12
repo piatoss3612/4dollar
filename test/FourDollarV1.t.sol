@@ -2,6 +2,7 @@
 pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
+import {IFourDollarV1} from "../src/interfaces/IFourDollarV1.sol";
 import {FourDollarNFT} from "../src/FourDollarNFT.sol";
 import {FourDollarV1} from "../src/FourDollarV1.sol";
 import {FourDollarProxy} from "../src/FourDollarProxy.sol";
@@ -30,8 +31,6 @@ contract FourDollarV1Test is Test {
     Account public donator;
 
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
-    event Donate(address indexed donator, address indexed asset, uint256 assetAmount, uint256 usdAmount);
-    event Transfer(address indexed to, uint256 amount);
 
     function setUp() public {
         owner = makeAccount("owner");
@@ -100,7 +99,9 @@ contract FourDollarV1Test is Test {
         vm.expectEmit(true, true, true, true);
         emit Transfer(address(0), donator.addr, 0);
         vm.expectEmit(true, true, true, true);
-        emit Donate(donator.addr, address(0), amount, usdAmount);
+        emit IFourDollarV1.LevelUp(donator.addr, 1);
+        vm.expectEmit(true, true, true, true);
+        emit IFourDollarV1.Donate(donator.addr, address(0), amount, usdAmount);
 
         vm.prank(donator.addr);
         instance.donate{value: amount}();
@@ -120,7 +121,9 @@ contract FourDollarV1Test is Test {
         vm.expectEmit(true, true, true, true);
         emit Transfer(address(0), donator.addr, 0);
         vm.expectEmit(true, true, true, true);
-        emit Donate(donator.addr, address(0), amount, usdAmount);
+        emit IFourDollarV1.LevelUp(donator.addr, 1);
+        vm.expectEmit(true, true, true, true);
+        emit IFourDollarV1.Donate(donator.addr, address(0), amount, usdAmount);
 
         vm.prank(donator.addr);
         (bool ok,) = address(instance).call{value: amount}("");
@@ -142,7 +145,9 @@ contract FourDollarV1Test is Test {
         vm.expectEmit(true, true, true, true);
         emit Transfer(address(0), donator.addr, 0);
         vm.expectEmit(true, true, true, true);
-        emit Donate(donator.addr, address(0), amount, usdAmount);
+        emit IFourDollarV1.LevelUp(donator.addr, 1);
+        vm.expectEmit(true, true, true, true);
+        emit IFourDollarV1.Donate(donator.addr, address(0), amount, usdAmount);
 
         vm.prank(donator.addr);
         (bool ok,) = address(instance).call{value: amount}("fallback!");
@@ -162,7 +167,7 @@ contract FourDollarV1Test is Test {
         uint256 usdAmount = instance.calculateBaseAssetAmountInUSD(amount);
 
         vm.expectEmit(true, true, true, true);
-        emit Donate(donator.addr, address(0), amount, usdAmount);
+        emit IFourDollarV1.Donate(donator.addr, address(0), amount, usdAmount);
 
         vm.startPrank(donator.addr);
         instance.donate{value: amount}();
@@ -170,7 +175,9 @@ contract FourDollarV1Test is Test {
         vm.expectEmit(true, true, true, true);
         emit Transfer(address(0), donator.addr, 0);
         vm.expectEmit(true, true, true, true);
-        emit Donate(donator.addr, address(0), amount, usdAmount);
+        emit IFourDollarV1.LevelUp(donator.addr, 1);
+        vm.expectEmit(true, true, true, true);
+        emit IFourDollarV1.Donate(donator.addr, address(0), amount, usdAmount);
 
         instance.donate{value: amount}();
 
@@ -238,7 +245,7 @@ contract FourDollarV1Test is Test {
         assertEq(balance, amount);
 
         vm.expectEmit(true, true, true, true);
-        emit Transfer(owner.addr, 4 ether);
+        emit IFourDollarV1.Transfer(owner.addr, 4 ether);
 
         vm.prank(owner.addr);
         instance.withdraw(owner.addr, balance);

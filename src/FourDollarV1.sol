@@ -105,7 +105,7 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
 
     function currentLevel(uint256 tokenId_) external view override returns (uint8 level) {
         address owner = nft.ownerOf(tokenId_);
-        level = _calculateLevel(owner);
+        level = _calculateLevel(_donationAmountsInUSD[owner]);
     }
 
     function levelToTokenURI(uint8 _level) external view override returns (string memory) {
@@ -133,7 +133,9 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
             _level = uint8(_levelsLength - 1);
         }
 
-        if (_level > _calculateLevel(owner)) {
+        uint256 amountInUSD = _donationAmountsInUSD[owner];
+
+        if (_level > _calculateLevel(amountInUSD)) {
             revert LevelNotReached(_level);
         }
 
@@ -193,9 +195,12 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
     ||    Internal functions    ||
     ==============================
     */
-    function _calculateLevel(address _owner) internal view returns (uint8) {
-        uint256 _amount = _donationAmountsInUSD[_owner];
-        uint256 count = _amount / FOUR_DOLLAR_DENOMINATOR;
+    function _calculateDonationCount(uint256 _amount) internal pure returns (uint256) {
+        return _amount / FOUR_DOLLAR_DENOMINATOR;
+    }
+
+    function _calculateLevel(uint256 _amountInUSD) internal view returns (uint8) {
+        uint256 count = _amountInUSD / FOUR_DOLLAR_DENOMINATOR;
 
         uint8 i = 0;
         uint256 levelsLength = _levelsLength;
@@ -226,11 +231,18 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
 
         _donationAmountsInUSD[msg.sender] = donationAmountInUSDAfter;
 
-        uint256 donationCountBefore = donationAmountInUSDBefore / FOUR_DOLLAR_DENOMINATOR;
-        uint256 donationCountAfter = donationAmountInUSDAfter / FOUR_DOLLAR_DENOMINATOR;
+        uint256 donationCountBefore = _calculateDonationCount(donationAmountInUSDBefore);
+        uint256 donationCountAfter = _calculateDonationCount(donationAmountInUSDAfter);
+
+        uint8 levelBefore = _calculateLevel(donationAmountInUSDBefore);
+        uint8 levelAfter = _calculateLevel(donationAmountInUSDAfter);
 
         if (donationCountBefore == 0 && donationCountAfter > 0) {
             _mint(msg.sender);
+        }
+
+        if (levelBefore != levelAfter) {
+            emit LevelUp(msg.sender, levelAfter);
         }
 
         emit Donate(msg.sender, address(0), amount, amountInUSD);

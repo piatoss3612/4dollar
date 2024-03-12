@@ -11,7 +11,7 @@ interface IFourDollarV1 {
     error CallFailed();
 
     event Initialize(address indexed owner, uint256 totalLevels);
-    event Upgrade(address indexed owner, uint256 indexed tokenId, uint8 indexed level);
+    event LevelUp(address indexed owner, uint8 indexed level);
     event Donate(address indexed donator, address indexed asset, uint256 assetAmount, uint256 usdAmount);
     event Transfer(address indexed to, uint256 amount);
 
