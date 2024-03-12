@@ -3,7 +3,7 @@
 <img src="https://i.namu.wiki/i/NwNrY0k4ZfvftBuYfrknvyYrMK8QMpiEtCLCFMfondCosxfpm-PtIV3P4M_iCNYlXoo6y4Vz9I3B0L73sJdzZqiU9aPNWkOa3zloD0OK_sl1ZHhx76TSc3te9JlYbFEpmtyO4pC2zo9xHYD_zNCGRA.webp"
     width="400"
  />
- <h3>당신의 4딸라로 누군가는 역사를 바꾼다.</h3>
+ <h3>당신의 4딸라, 누군가는 역사를 만든다.</h3>
 
 <br/>
 
