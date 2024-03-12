@@ -33,7 +33,13 @@ contract FourDollarNFT is IFourDollarNFT, ERC721, ERC721URIStorage, Ownable {
         return interfaceId == type(IFourDollarNFT).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override(ERC721, ERC721URIStorage) returns (string memory) {
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override(IFourDollarNFT, ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
         return super.tokenURI(tokenId);
     }
 
@@ -75,7 +81,10 @@ contract FourDollarNFT is IFourDollarNFT, ERC721, ERC721URIStorage, Ownable {
         return tokenId_;
     }
 
-    function _transferOwnership(address) internal virtual override(Ownable) {
-        revert OwnableTransferNotAllowed();
+    function _transferOwnership(address _newOwner) internal virtual override(Ownable) {
+        if (owner() != address(0)) {
+            revert OwnableTransferNotAllowed();
+        }
+        super._transferOwnership(_newOwner);
     }
 }

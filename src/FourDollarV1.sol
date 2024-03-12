@@ -159,6 +159,8 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
         }
 
         payable(_to).transfer(_amount);
+
+        emit Transfer(_to, _amount);
     }
 
     function call(address _to, uint256 _amount, bytes calldata _data)
@@ -180,6 +182,9 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
         if (!success) {
             revert CallFailed();
         }
+
+        emit Transfer(_to, _amount);
+
         return result;
     }
 
@@ -228,7 +233,7 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
             _mint(msg.sender);
         }
 
-        emit Donation(msg.sender, address(0), amount);
+        emit Donate(msg.sender, address(0), amount, amountInUSD);
     }
 
     function _mint(address _to) internal {
@@ -238,8 +243,11 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
 
     function _authorizeUpgrade(address) internal virtual override onlyOwner {}
 
-    function _transferOwnership(address) internal virtual override {
-        revert OwnableTransferNotAllowed();
+    function _transferOwnership(address _newOwner) internal virtual override {
+        if (owner() != address(0)) {
+            revert OwnableTransferNotAllowed();
+        }
+        super._transferOwnership(_newOwner);
     }
 
     /*
