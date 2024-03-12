@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import {IFourDollar} from "./interfaces/IFourDollar.sol";
+import {IFourDollarV1} from "./interfaces/IFourDollarV1.sol";
 import {ISimpleOracle} from "./interfaces/ISimpleOracle.sol";
+import {IFourDollarNFT} from "./interfaces/IFourDollarNFT.sol";
+import {FourDollarNFT} from "./FourDollarNFT.sol";
 import {AggregatorV3Interface} from "./interfaces/AggregatorV3Interface.sol";
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {ERC721URIStorage} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable, ReentrancyGuard {
+contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSUpgradeable, ReentrancyGuard {
     error OnlyOwnerOfToken();
     error SoulBound();
     error OwnableTransferNotAllowed();
@@ -19,21 +21,35 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable, Reentranc
     uint256 public constant USD_DECIMALS = 8;
     uint256 public constant FOUR_DOLLAR_DENOMINATOR = 4 * 10 ** USD_DECIMALS;
 
-    ISimpleOracle public immutable oracle;
+    ISimpleOracle public oracle;
+    IFourDollarNFT public nft;
 
-    uint8[] private _levels;
-    string[] private _uris;
+    uint8[10] private _levels;
+    string[10] private _uris;
+    uint8 private _levelsLength;
 
     mapping(address donator => uint256 amount) private _donationAmountsInUSD;
-    uint256 private _tokenId;
 
-    constructor(
+    constructor() {
+        _disableInitializers();
+    }
+
+    /*
+    ==============================
+    ||    Public functions      ||
+    ==============================
+    */
+
+    function initialize(
         string memory _name,
         string memory _symbol,
         uint8[] memory levels_,
         string[] memory uris_,
         ISimpleOracle _oracle
-    ) ERC721(_name, _symbol) Ownable(msg.sender) {
+    ) public initializer {
+        __Ownable_init(msg.sender);
+        __UUPSUpgradeable_init();
+
         uint256 levelsLength = levels_.length;
         uint256 urisLength = uris_.length;
 
@@ -54,49 +70,33 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable, Reentranc
         }
 
         oracle = _oracle;
+        _levelsLength = uint8(levelsLength);
 
-        _levels.push(levels_[0]);
-        _uris.push(uris_[0]);
+        _levels[0] = levels_[0];
+        _uris[0] = uris_[0];
 
-        if (levelsLength == 1) {
-            emit Creation(msg.sender, levelsLength);
-            return;
-        }
+        if (levelsLength > 1) {
+            uint256 i = 1;
+            for (i; i < levelsLength;) {
+                if (levels_[i] <= levels_[i - 1]) {
+                    revert InvalidConstructorArguments("Levels must be in ascending order");
+                }
 
-        uint256 i = 1;
-        for (i; i < levelsLength;) {
-            if (levels_[i] <= levels_[i - 1]) {
-                revert InvalidConstructorArguments("Levels must be in ascending order");
-            }
-
-            _levels.push(levels_[i]);
-            _uris.push(uris_[i]);
-            unchecked {
-                i += 1;
+                _levels[i] = levels_[i];
+                _uris[i] = uris_[i];
+                unchecked {
+                    i += 1;
+                }
             }
         }
 
-        emit Creation(msg.sender, levelsLength);
+        nft = new FourDollarNFT(_name, _symbol);
+
+        emit Initialize(msg.sender, levelsLength);
     }
 
-    /*
-    ==============================
-    ||    Public functions      ||
-    ==============================
-    */
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC721, ERC721URIStorage)
-        returns (bool)
-    {
-        return interfaceId == type(IFourDollar).interfaceId || super.supportsInterface(interfaceId);
-    }
-
-    function tokenURI(uint256 tokenId) public view virtual override(ERC721, ERC721URIStorage) returns (string memory) {
-        return super.tokenURI(tokenId);
+    function version() external pure override returns (string memory) {
+        return "v1";
     }
 
     function donationAmountInUSD(address _donator) external view override returns (uint256) {
@@ -104,40 +104,40 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable, Reentranc
     }
 
     function currentLevel(uint256 tokenId_) external view override returns (uint8 level) {
-        address owner = ownerOf(tokenId_);
+        address owner = nft.ownerOf(tokenId_);
         level = _calculateLevel(owner);
     }
 
     function levelToTokenURI(uint8 _level) external view override returns (string memory) {
-        if (_level >= _levels.length) {
-            return _uris[_levels.length - 1];
+        if (_level >= _levelsLength) {
+            return _uris[_levelsLength - 1];
         }
 
         return _uris[_level];
     }
 
     function levelToDonationCount(uint8 _level) external view override returns (uint256) {
-        if (_level >= _levels.length) {
-            return _levels[_levels.length - 1];
+        if (_level >= _levelsLength) {
+            return _levels[_levelsLength - 1];
         }
         return _levels[_level];
     }
 
     function setTokenURI(uint256 tokenId_, uint8 _level) external {
-        address owner = ownerOf(tokenId_);
+        address owner = nft.ownerOf(tokenId_);
         if (owner != msg.sender) {
             revert OnlyOwnerOfToken();
         }
 
-        if (_level >= _levels.length) {
-            _level = uint8(_levels.length - 1);
+        if (_level >= _levelsLength) {
+            _level = uint8(_levelsLength - 1);
         }
 
         if (_level > _calculateLevel(owner)) {
             revert LevelNotReached(_level);
         }
 
-        _setTokenURI(tokenId_, _uris[_level]);
+        nft.setTokenURI(tokenId_, _uris[_level]);
     }
 
     function calculateBaseAssetAmountInUSD(uint256 _amount) public view returns (uint256 amountInUSD) {
@@ -185,24 +185,6 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable, Reentranc
 
     /*
     ==============================
-    ||   SoulBound functions    ||
-    ==============================
-    */
-
-    function transferFrom(address, address, uint256) public override(IERC721, ERC721) {
-        revert SoulBound();
-    }
-
-    function safeTransferFrom(address, address, uint256, bytes memory) public override(IERC721, ERC721) {
-        revert SoulBound();
-    }
-
-    function approve(address, uint256) public override(IERC721, ERC721) {
-        revert SoulBound();
-    }
-
-    /*
-    ==============================
     ||    Internal functions    ||
     ==============================
     */
@@ -211,7 +193,7 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable, Reentranc
         uint256 count = _amount / FOUR_DOLLAR_DENOMINATOR;
 
         uint8 i = 0;
-        uint256 levelsLength = _levels.length;
+        uint256 levelsLength = _levelsLength;
 
         for (i; i < levelsLength;) {
             if (count < _levels[i]) {
@@ -249,15 +231,17 @@ contract FourDollar is IFourDollar, ERC721, ERC721URIStorage, Ownable, Reentranc
         emit Donation(msg.sender, address(0), amount);
     }
 
-    function _mint(address to) internal virtual {
-        uint256 tokenId_ = _tokenId++;
-        _mint(to, tokenId_);
-        _setTokenURI(tokenId_, _uris[0]);
+    function _mint(address _to) internal {
+        string memory uri = _uris[0];
+        nft.mint(_to, uri);
     }
 
-    function _transferOwnership(address) internal virtual override(Ownable) {
+    function _authorizeUpgrade(address) internal virtual override onlyOwner {}
+
+    function _transferOwnership(address) internal virtual override {
         revert OwnableTransferNotAllowed();
     }
+
     /*
     ==============================
     ||    Fallback functions    ||
