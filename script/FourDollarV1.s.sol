@@ -28,11 +28,6 @@ contract FourDollarV1Script is Script {
             revert("Unsupported chainid");
         }
 
-        vm.startBroadcast(privateKey);
-
-        SimpleOracleChainlink oracle = new SimpleOracleChainlink(priceFeed);
-        FourDollarV1 impl = new FourDollarV1();
-
         uint8[] memory levels = new uint8[](4);
         string[] memory uris = new string[](4);
 
@@ -46,10 +41,16 @@ contract FourDollarV1Script is Script {
         uris[2] = "ipfs://QmbgruwjEoUZfM1hLzNDNvELLWAprpzxaxJkdWHxrbLqKP";
         uris[3] = "ipfs://QmQmnkLwCX5n6ZWntXRGtdLDappyPtdQS8XfXFKCvp4c4J";
 
-        // TODO: set levels and uris
+        string memory name = "PIATOSS";
+        string memory symbol = "PTS";
 
-        string memory name = "Piatoss";
-        string memory symbol = "PIA";
+        vm.startBroadcast(privateKey);
+
+        SimpleOracleChainlink oracle = new SimpleOracleChainlink(priceFeed);
+
+        console.log("Deployed SimpleOracleChainlink at", address(oracle));
+
+        FourDollarV1 impl = new FourDollarV1();
 
         bytes memory data = abi.encodeWithSelector(impl.initialize.selector, name, symbol, levels, uris, oracle);
 

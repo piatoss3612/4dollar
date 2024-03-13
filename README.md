@@ -21,4 +21,29 @@
 <p>개인 프로필 사이트에 기능을 추가하기 위해 개발 😎</p>
 <p>요즘 Web3 + AI를 같이 사용하다보니 숨만 쉬어도 통장이 깎여나가고 있는 것을 통감...</p>
 
+<h2>📜 Contracts</h2>
+
+<table>
+  <tr>
+    <th>Network</th>
+    <th>Contract</th>
+    <th>Address</th>
+  </tr>
+  <tr>
+    <td>Mumbai</td>
+    <td>SimpleOracle</td>
+    <td>0x9F3CF7c78E024B94cd12F36f037ef8ab2aFab26c</td>    
+    </tr>
+    <tr>
+    <td>Mumbai</td>
+    <td>FourDollarV1Impl</td>
+    <td>0xf5FdCa795Ba9D37dB627f084367eB22a64887cf7</td>    
+    </tr>
+    <tr>
+    <td>Mumbai</td>
+    <td>FourDollarV1Proxy</td>
+    <td>0x7Bb88774d8F2c15779C8f8278C4ed8E5729d1678</td>    
+    </tr>
+</table>
+
 </div>
