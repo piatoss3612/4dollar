@@ -44,6 +44,21 @@
     <td>FourDollarV1Proxy</td>
     <td>0x7Bb88774d8F2c15779C8f8278C4ed8E5729d1678</td>    
     </tr>
+ <tr>
+    <td>Sepolia</td>
+    <td>SimpleOracle</td>
+    <td>0x2358f6c8E9FEA7cB8AFF16FfE7E3a4149aF9C4c4</td>
+    </tr>
+    <tr>
+    <td>Sepolia</td>
+    <td>FourDollarV1Impl</td>
+    <td>0x972ae31B2446c23c8805aAaaBeaa76Cd26Bc77a6</td>
+    </tr>
+    <tr>
+    <td>Sepolia</td>
+    <td>FourDollarV1Proxy</td>
+    <td>0x203A36744dD130f1De981EC72c2144862aECE6AA</td>
+    </tr>
 </table>
 
 </div>

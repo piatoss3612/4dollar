@@ -9,9 +9,11 @@ remappings = [
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 [rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
 mumbai = "${MUMBAI_RPC_URL}"
 polygon = "${POLYGON_RPC_URL}"
 
 [etherscan]
+sepolia = { key = "${SEPOLIA_ETHERSCAN_API_KEY}" }
 mumbai = { key = "${POLYGONSCAN_API_KEY}", url = "https://api-testnet.polygonscan.com/api" }
 polygon = { key = "${POLYGONSCAN_API_KEY}", url = "https://api.polygonscan.com/api" }

@@ -24,6 +24,9 @@ contract FourDollarV1Script is Script {
         } else if (chainid == 137) {
             // polygon mainnet
             priceFeed = Configs.CHAINLINK_MATIC_USD_POLYGON_ADDRESS;
+        } else if (chainid == 11155111) {
+            // sepolia testnet
+            priceFeed = Configs.CHAINLINK_ETH_USD_SEPOLIA_ADDRESS;
         } else {
             revert("Unsupported chainid");
         }
