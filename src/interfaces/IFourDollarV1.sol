@@ -16,6 +16,7 @@ interface IFourDollarV1 {
     event Transfer(address indexed to, uint256 amount);
 
     function version() external pure returns (string memory);
+    function ownedToken(address owner) external view returns (uint256);
     function currentLevel(uint256 _tokenId) external view returns (uint8);
     function donationAmountInUSD(address _donator) external view returns (uint256);
     function levelToTokenURI(uint8 _level) external view returns (string memory);

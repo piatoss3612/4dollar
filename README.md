@@ -32,17 +32,17 @@
   <tr>
     <td>Mumbai</td>
     <td>SimpleOracle</td>
-    <td>0x9F3CF7c78E024B94cd12F36f037ef8ab2aFab26c</td>    
+    <td>0x00810Dfd1ac1D5fa2E4904BbF833EDDDC6707a5C</td>    
     </tr>
     <tr>
     <td>Mumbai</td>
     <td>FourDollarV1Impl</td>
-    <td>0xf5FdCa795Ba9D37dB627f084367eB22a64887cf7</td>    
+    <td>0x76eA44FCaBaE41Df4B27aE0869044580304dbB2d</td>    
     </tr>
     <tr>
     <td>Mumbai</td>
     <td>FourDollarV1Proxy</td>
-    <td>0x7Bb88774d8F2c15779C8f8278C4ed8E5729d1678</td>    
+    <td>0xA37A5a00e55b90B9522bB5181Fe4d64326a2bd36</td>    
     </tr>
  <tr>
     <td>Sepolia</td>

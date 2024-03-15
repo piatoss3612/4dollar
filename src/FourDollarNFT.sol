@@ -14,6 +14,7 @@ contract FourDollarNFT is IFourDollarNFT, ERC721, ERC721URIStorage, Ownable {
     error OwnableTransferNotAllowed();
 
     uint256 private _tokenId;
+    mapping(address owner => uint256 tokenId) private _ownedTokens;
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Ownable(msg.sender) {}
 
@@ -51,6 +52,14 @@ contract FourDollarNFT is IFourDollarNFT, ERC721, ERC721URIStorage, Ownable {
         _setTokenURI(tokenId_, _uri);
     }
 
+    function ownedToken(address owner) public view override returns (uint256) {
+        uint256 tokenId = _ownedTokens[owner];
+        if (tokenId == 0) {
+            revert InsufficientBalance();
+        }
+        return tokenId;
+    }
+
     /*
     ==============================
     ||   SoulBound functions    ||
@@ -75,8 +84,9 @@ contract FourDollarNFT is IFourDollarNFT, ERC721, ERC721URIStorage, Ownable {
     ==============================
     */
     function _mint(address to, string memory _uri) internal virtual returns (uint256) {
-        uint256 tokenId_ = _tokenId++;
+        uint256 tokenId_ = ++_tokenId;
         _mint(to, tokenId_);
+        _ownedTokens[to] = tokenId_;
         _setTokenURI(tokenId_, _uri);
         return tokenId_;
     }

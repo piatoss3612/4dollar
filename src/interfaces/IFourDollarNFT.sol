@@ -15,4 +15,5 @@ interface IFourDollarNFT is IERC721 {
     function mint(address to, string memory _uri) external returns (uint256);
     function setTokenURI(uint256 tokenId_, string memory _uri) external;
     function tokenURI(uint256 tokenId) external view returns (string memory);
+    function ownedToken(address owner) external view returns (uint256);
 }

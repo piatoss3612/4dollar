@@ -97,7 +97,7 @@ contract FourDollarV1Test is Test {
         uint256 usdAmount = instance.calculateBaseAssetAmountInUSD(amount);
 
         vm.expectEmit(true, true, true, true);
-        emit Transfer(address(0), donator.addr, 0);
+        emit Transfer(address(0), donator.addr, 1);
         vm.expectEmit(true, true, true, true);
         emit IFourDollarV1.LevelUp(donator.addr, 1);
         vm.expectEmit(true, true, true, true);
@@ -108,8 +108,9 @@ contract FourDollarV1Test is Test {
 
         assertEq(instance.donationAmountInUSD(donator.addr), usdAmount);
         assertEq(instance.nft().balanceOf(donator.addr), 1);
-        assertEq(instance.nft().ownerOf(0), donator.addr);
-        assertEq(instance.currentLevel(0), 1);
+        assertEq(instance.nft().ownerOf(1), donator.addr);
+        assertEq(instance.currentLevel(1), 1);
+        assertEq(instance.nft().tokenURI(1), uris[1]);
     }
 
     function test_DonateMoreThan4DollarViaReceive() public {
@@ -119,7 +120,7 @@ contract FourDollarV1Test is Test {
         uint256 usdAmount = instance.calculateBaseAssetAmountInUSD(amount);
 
         vm.expectEmit(true, true, true, true);
-        emit Transfer(address(0), donator.addr, 0);
+        emit Transfer(address(0), donator.addr, 1);
         vm.expectEmit(true, true, true, true);
         emit IFourDollarV1.LevelUp(donator.addr, 1);
         vm.expectEmit(true, true, true, true);
@@ -131,9 +132,9 @@ contract FourDollarV1Test is Test {
 
         assertEq(instance.donationAmountInUSD(donator.addr), usdAmount);
         assertEq(instance.nft().balanceOf(donator.addr), 1);
-        assertEq(instance.nft().ownerOf(0), donator.addr);
-        assertEq(instance.currentLevel(0), 1);
-        assertEq(instance.nft().tokenURI(0), uris[0]);
+        assertEq(instance.nft().ownerOf(1), donator.addr);
+        assertEq(instance.currentLevel(1), 1);
+        assertEq(instance.nft().tokenURI(1), uris[1]);
     }
 
     function test_DonateMoreThan4DollarViaFallback() public {
@@ -143,7 +144,7 @@ contract FourDollarV1Test is Test {
         uint256 usdAmount = instance.calculateBaseAssetAmountInUSD(amount);
 
         vm.expectEmit(true, true, true, true);
-        emit Transfer(address(0), donator.addr, 0);
+        emit Transfer(address(0), donator.addr, 1);
         vm.expectEmit(true, true, true, true);
         emit IFourDollarV1.LevelUp(donator.addr, 1);
         vm.expectEmit(true, true, true, true);
@@ -155,9 +156,9 @@ contract FourDollarV1Test is Test {
 
         assertEq(instance.donationAmountInUSD(donator.addr), usdAmount);
         assertEq(instance.nft().balanceOf(donator.addr), 1);
-        assertEq(instance.nft().ownerOf(0), donator.addr);
-        assertEq(instance.currentLevel(0), 1);
-        assertEq(instance.nft().tokenURI(0), uris[0]);
+        assertEq(instance.nft().ownerOf(1), donator.addr);
+        assertEq(instance.currentLevel(1), 1);
+        assertEq(instance.nft().tokenURI(1), uris[1]);
     }
 
     function test_DonateTwiceAndIssueNFT() public {
@@ -173,7 +174,7 @@ contract FourDollarV1Test is Test {
         instance.donate{value: amount}();
 
         vm.expectEmit(true, true, true, true);
-        emit Transfer(address(0), donator.addr, 0);
+        emit Transfer(address(0), donator.addr, 1);
         vm.expectEmit(true, true, true, true);
         emit IFourDollarV1.LevelUp(donator.addr, 1);
         vm.expectEmit(true, true, true, true);
@@ -185,11 +186,12 @@ contract FourDollarV1Test is Test {
 
         assertEq(instance.donationAmountInUSD(donator.addr), usdAmount * 2);
         assertEq(instance.nft().balanceOf(donator.addr), 1);
-        assertEq(instance.nft().ownerOf(0), donator.addr);
-        assertEq(instance.currentLevel(0), 1);
+        assertEq(instance.nft().ownerOf(1), donator.addr);
+        assertEq(instance.currentLevel(1), 1);
+        assertEq(instance.nft().tokenURI(1), uris[1]);
     }
 
-    function test_DonateAndUpgradeNFT() public {
+    function test_DonateAndDowngradeNFT() public {
         FourDollarV1 instance = FourDollarV1(payable(address(proxy)));
 
         uint256 amount = 4 ether;
@@ -197,13 +199,17 @@ contract FourDollarV1Test is Test {
         vm.startPrank(donator.addr);
         instance.donate{value: amount}();
 
-        uint8 level = instance.currentLevel(0);
+        uint256 tokenId = instance.nft().ownedToken(donator.addr);
+
+        assertEq(instance.nft().tokenURI(tokenId), uris[1]);
+
+        uint8 level = instance.currentLevel(tokenId);
 
         assertGt(level, 0);
 
-        instance.setTokenURI(0, level);
+        instance.setTokenURI(tokenId, 0);
 
-        assertEq(instance.nft().tokenURI(0), uris[level]);
+        assertEq(instance.nft().tokenURI(tokenId), uris[0]);
     }
 
     function test_DonateAndUpgradeToMaxLevel() public {
@@ -214,13 +220,15 @@ contract FourDollarV1Test is Test {
         vm.startPrank(donator.addr);
         instance.donate{value: amount}();
 
-        uint8 level = instance.currentLevel(0);
+        uint256 tokenId = instance.nft().ownedToken(donator.addr);
+
+        uint8 level = instance.currentLevel(tokenId);
 
         assertGe(level, levels.length);
 
-        instance.setTokenURI(0, level);
+        instance.setTokenURI(tokenId, level);
 
-        assertEq(instance.nft().tokenURI(0), uris[levels.length - 1]);
+        assertEq(instance.nft().tokenURI(tokenId), uris[levels.length - 1]);
     }
 
     function test_RevertDonateByZeroValue() public {
@@ -316,7 +324,7 @@ contract FourDollarV1Test is Test {
         vm.expectRevert(OnlyOwnerOfToken.selector);
 
         vm.prank(owner.addr);
-        instance.setTokenURI(0, 1);
+        instance.setTokenURI(1, 1);
     }
 
     function test_RevertSetTokenURIByLevelNotReached() public {
@@ -330,7 +338,7 @@ contract FourDollarV1Test is Test {
         vm.expectRevert(abi.encodePacked(LevelNotReached.selector, abi.encode(levels.length - 1)));
 
         vm.prank(donator.addr);
-        instance.setTokenURI(0, 10);
+        instance.setTokenURI(1, 10);
     }
 
     function test_UpgradeToAndCall() public {

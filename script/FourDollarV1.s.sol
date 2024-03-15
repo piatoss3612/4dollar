@@ -14,8 +14,6 @@ contract FourDollarV1Script is Script {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
         uint256 chainid = block.chainid;
 
-        console.log(chainid);
-
         address priceFeed;
 
         if (chainid == 80001) {
@@ -62,5 +60,40 @@ contract FourDollarV1Script is Script {
         console.log("Deployed FourDollarV1Proxy at", address(proxy));
 
         vm.stopBroadcast();
+    }
+}
+
+contract WithdrawScript is Script {
+    function setUp() public {}
+
+    function run() public {
+        uint256 privateKey = vm.envUint("PRIVATE_KEY");
+        uint256 chainid = block.chainid;
+
+        address proxy;
+
+        if (chainid == 80001) {
+            // mumbai testnet
+            proxy = 0x99eb4FA25e0a3a4Eb8E7b53370D74ca76AF4b575;
+        } else if (chainid == 137) {
+            // polygon mainnet
+        } else if (chainid == 11155111) {
+            // sepolia testnet
+            proxy = 0x203A36744dD130f1De981EC72c2144862aECE6AA;
+        } else {
+            revert("Unsupported chainid");
+        }
+
+        vm.startBroadcast(privateKey);
+
+        FourDollarV1 proxyContract = FourDollarV1(payable(proxy));
+
+        uint256 amountToWithdraw = proxy.balance;
+
+        proxyContract.withdraw(vm.addr(privateKey), amountToWithdraw);
+
+        vm.stopBroadcast();
+
+        console.log("Withdrawn", amountToWithdraw, "ETH from", address(proxy));
     }
 }

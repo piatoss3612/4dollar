@@ -99,6 +99,10 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
         return "v1";
     }
 
+    function ownedToken(address owner) external view override returns (uint256) {
+        return nft.ownedToken(owner);
+    }
+
     function donationAmountInUSD(address _donator) external view override returns (uint256) {
         return _donationAmountsInUSD[_donator];
     }
@@ -242,6 +246,8 @@ contract FourDollarV1 is IFourDollarV1, Initializable, OwnableUpgradeable, UUPSU
         }
 
         if (levelBefore != levelAfter) {
+            uint256 tokenId = nft.ownedToken(msg.sender);
+            nft.setTokenURI(tokenId, _uris[levelAfter]);
             emit LevelUp(msg.sender, levelAfter);
         }
 
