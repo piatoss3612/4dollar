@@ -20,6 +20,7 @@
 
 <p>개인 프로필 사이트에 기능을 추가하기 위해 개발 😎</p>
 <p>요즘 Web3 + AI를 같이 사용하다보니 숨만 쉬어도 통장이 깎여나가고 있는 것을 통감...</p>
+<p>가격 오라클 활용 + UUPS 패턴</p>
 
 <h2>📜 Contracts</h2>
 
@@ -59,8 +60,7 @@
     <td>FourDollarV1Proxy</td>
     <td>0x203A36744dD130f1De981EC72c2144862aECE6AA</td>
     </tr>
-    
-    <tr>
+   <tr>
     <td>Polygon</td>
     <td>SimpleOracle</td>
     <td>0xA83d0e4EA5D4C5fA9f8A0379423fe7f03E6D6159</td>
@@ -76,5 +76,4 @@
     <td>0x4FA0032BD433aC07418ca4d28031D48a4c384079</td>
     </tr>
 </table>
-
 </div>
