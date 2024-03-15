@@ -14,6 +14,6 @@ mumbai = "${MUMBAI_RPC_URL}"
 polygon = "${POLYGON_RPC_URL}"
 
 [etherscan]
-sepolia = { key = "${SEPOLIA_ETHERSCAN_API_KEY}" }
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
 mumbai = { key = "${POLYGONSCAN_API_KEY}", url = "https://api-testnet.polygonscan.com/api" }
 polygon = { key = "${POLYGONSCAN_API_KEY}", url = "https://api.polygonscan.com/api" }

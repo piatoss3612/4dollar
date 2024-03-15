@@ -59,6 +59,22 @@
     <td>FourDollarV1Proxy</td>
     <td>0x203A36744dD130f1De981EC72c2144862aECE6AA</td>
     </tr>
+    
+    <tr>
+    <td>Polygon</td>
+    <td>SimpleOracle</td>
+    <td>0xA83d0e4EA5D4C5fA9f8A0379423fe7f03E6D6159</td>
+    </tr>
+    <tr>
+    <td>Polygon</td>
+    <td>FourDollarV1Impl</td>
+    <td>0xeC7E7b1Cd514bAcF0B5C7d0Af0F3cb55AA3102Ce</td>
+    </tr>
+    <tr>
+    <td>Polygon</td>
+    <td>FourDollarV1Proxy</td>
+    <td>0x4FA0032BD433aC07418ca4d28031D48a4c384079</td>
+    </tr>
 </table>
 
 </div>
